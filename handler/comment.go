@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,8 +11,14 @@ import (
 )
 
 func (h *Handler) GetComment(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
-	a, err := h.commentStore.GetCommentByID(uint(id))
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id := uint(id64)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	a, err := h.commentStore.GetCommentByID(id)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
@@ -30,16 +35,9 @@ func (h *Handler) CreateComment(c echo.Context) error {
 	var m model.Comment
 
 	req := &createCommentRequest{}
-	fmt.Println("Create Comment")
-	fmt.Println(req.Comment.PostID)
-	fmt.Println(req.Comment.Body)
 	if err := req.bind(c, &m); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
-
-	fmt.Println("After Bind")
-	fmt.Println(req.Comment.PostID)
-	fmt.Println(req.Comment.Body)
 
 	m.AuthorID = userIDFromToken(c)
 
@@ -52,9 +50,14 @@ func (h *Handler) CreateComment(c echo.Context) error {
 }
 
 func (h *Handler) UpdateComment(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id := uint(id64)
 
-	m, err := h.commentStore.GetCommentByID(uint(id))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	m, err := h.commentStore.GetCommentByID(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
 	}
@@ -67,6 +70,9 @@ func (h *Handler) UpdateComment(c echo.Context) error {
 
 	if err := req.bind(c, m); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+	if err = h.commentStore.UpdateComment(m); err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
 	}
 
 	return c.JSON(http.StatusOK, newCommentResponse(c, m))

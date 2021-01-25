@@ -7,7 +7,7 @@ import (
 type Store interface {
 	GetPostByID(uint) (*model.Post, error)
 	CreatePost(*model.Post) error
-	UpdatePost(*model.Post, []string) error
+	UpdatePost(*model.Post) error
 	DeletePost(*model.Post) error
 	ListPost(offset, limit int) ([]model.Post, int, error)
 }

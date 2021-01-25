@@ -22,9 +22,14 @@ import (
 // @Failure 500 {object} utils.Error
 // @Router /posts/{slug} [get]
 func (h *Handler) GetPost(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id := uint(id64)
 
-	a, err := h.postStore.GetPostByID(uint(id))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	a, err := h.postStore.GetPostByID(id)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
@@ -126,9 +131,14 @@ func (h *Handler) CreatePost(c echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /posts/{slug} [put]
 func (h *Handler) UpdatePost(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id := uint(id64)
 
-	a, err := h.postStore.GetPostByID(uint(id))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	a, err := h.postStore.GetPostByID(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
 	}
@@ -142,6 +152,10 @@ func (h *Handler) UpdatePost(c echo.Context) error {
 
 	if err := req.bind(c, a); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+
+	if err = h.postStore.UpdatePost(a); err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
 	}
 
 	return c.JSON(http.StatusOK, newPostResponse(c, a))
@@ -162,9 +176,14 @@ func (h *Handler) UpdatePost(c echo.Context) error {
 // @Security ApiKeyAuth
 // @Router /posts/{slug} [delete]
 func (h *Handler) DeletePost(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id := uint(id64)
 
-	a, err := h.postStore.GetPostByID(uint(id))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	a, err := h.postStore.GetPostByID(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
 	}

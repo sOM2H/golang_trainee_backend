@@ -36,7 +36,7 @@ func (as *PostStore) CreatePost(a *model.Post) error {
 	return tx.Commit().Error
 }
 
-func (as *PostStore) UpdatePost(a *model.Post, tagList []string) error {
+func (as *PostStore) UpdatePost(a *model.Post) error {
 	tx := as.db.Begin()
 	if err := tx.Model(a).Update(a).Error; err != nil {
 		tx.Rollback()
