@@ -9,5 +9,5 @@ type Store interface {
 	CreateComment(*model.Comment) error
 	UpdateComment(*model.Comment) error
 	DeleteComment(*model.Comment) error
-	ListComment(offset, limit int) ([]model.Comment, int, error)
+	ListCommentByPostID(offset, limit, id int) ([]model.Comment, int, error)
 }

@@ -25,8 +25,8 @@ func (h *Handler) Register(v1 *echo.Group) {
 
 	comments := v1.Group("/comments", jwtMiddleware)
 	comments.POST("", h.CreateComment)
-	comments.GET("", h.GetComments)
-	comments.GET("/:id", h.GetComment)
+	comments.GET("", h.GetComment)
+	comments.GET("/:id", h.ListCommentByPostID)
 	comments.PUT("/:id", h.UpdateComment)
 	comments.DELETE("/:id", h.DeleteComment)
 

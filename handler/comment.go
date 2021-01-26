@@ -78,7 +78,10 @@ func (h *Handler) UpdateComment(c echo.Context) error {
 	return c.JSON(http.StatusOK, newCommentResponse(c, m))
 }
 
-func (h *Handler) GetComments(c echo.Context) error {
+func (h *Handler) ListCommentByPostID(c echo.Context) error {
+	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	id := int(id64)
+
 	var (
 		comments []model.Comment
 	)
@@ -93,7 +96,7 @@ func (h *Handler) GetComments(c echo.Context) error {
 		offset = 0
 	}
 
-	comments, count, err := h.commentStore.ListComment(offset, limit)
+	comments, count, err := h.commentStore.ListCommentByPostID(offset, limit, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, nil)
 	}

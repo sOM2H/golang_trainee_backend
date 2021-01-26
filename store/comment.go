@@ -50,13 +50,13 @@ func (cs *CommentStore) DeleteComment(c *model.Comment) error {
 	return cs.db.Delete(c).Error
 }
 
-func (as *CommentStore) ListComment(offset, limit int) ([]model.Comment, int, error) {
+func (as *CommentStore) ListCommentByPostID(offset, limit, id int) ([]model.Comment, int, error) {
 	var (
 		comments []model.Comment
 		count    int
 	)
 
-	as.db.Order("created_at desc").Find(&comments)
+	as.db.Where("post_id = ?", id).Order("created_at desc").First(&comments)
 	as.db.Model(&comments).Count(&count)
 
 	return comments, count, nil
