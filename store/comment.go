@@ -56,8 +56,7 @@ func (as *CommentStore) ListCommentByPostID(offset, limit, id int) ([]model.Comm
 		count    int
 	)
 
-	query := as.db.Where("post_id = ?", id).Order("created_at desc")
-	query.Find(&comments)
+	as.db.Where("post_id = ?", id).Order("created_at desc").Find(&comments)
 	count = len(comments)
 
 	return comments, count, nil
