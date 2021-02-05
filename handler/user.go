@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/random"
 	"github.com/sOM2H/golang_trainee_backend/model"
 	"github.com/sOM2H/golang_trainee_backend/utils"
 )
@@ -64,6 +65,24 @@ func (h *Handler) Login(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
 	return c.JSON(http.StatusOK, newUserResponse(u))
+}
+
+func (h *Handler) OauthGoogle(c echo.Context) error {
+	token, _ := utils.VerifyIdToken(c.FormValue("token"))
+
+	user, err := h.userStore.GetByEmail(token.Email)
+	if err != nil || user == nil {
+		var u model.User
+		u.Email = token.Email
+		u.Password = random.String(8)
+
+		if err := h.userStore.Create(&u); err != nil {
+			return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+		}
+		return c.JSON(http.StatusCreated, newUserResponse(&u))
+	}
+
+	return c.JSON(http.StatusOK, newUserResponse(user))
 }
 
 // CurrentUser godoc

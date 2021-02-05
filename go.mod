@@ -13,6 +13,8 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/swaggo/echo-swagger v1.1.0
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
+	golang.org/x/oauth2 v0.0.0-20210201163806-010130855d6c
+	google.golang.org/api v0.39.0
 	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.0.3
